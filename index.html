@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ENGL111 Vocabulary Review</title>
+  <style>
+    :root{
+      --green:#1E7A46;
+      --green-dark:#11502C;
+      --green-mid:#3FA36A;
+      --green-soft:#E4F3EA;
+      --green-line:#CFE7D8;
+      --ink:#1F2A24;
+      --muted:#5E6E64;
+      --correct:#0F7A4A;
+      --wrong:#B3261E;
+      --card:#ffffff;
+      --shadow:0 8px 26px rgba(17,80,44,.12);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-padding-top:env(safe-area-inset-top,0px)}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:#ffffff;
+      color:var(--ink);
+      min-height:100vh;
+      padding-top:env(safe-area-inset-top,0px);
+      padding-bottom:env(safe-area-inset-bottom,0px);
+    }
+    .app{max-width:860px;margin:0 auto;padding:18px;}
+    header{
+      background:linear-gradient(135deg,var(--green),var(--green-dark));
+      color:white;border-radius:var(--radius);padding:22px 18px;
+      box-shadow:var(--shadow);margin-bottom:16px;
+    }
+    h1{font-size:clamp(1.55rem,5vw,2.5rem);margin:0 0 8px;line-height:1.05;}
+    header p{margin:0;opacity:.92;font-size:.98rem;}
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:16px;
+      box-shadow:var(--shadow);margin-bottom:16px;border:1px solid var(--green-line);
+    }
+    .grid{display:grid;grid-template-columns: repeat(auto-fit,minmax(170px,1fr));gap:10px;}
+    button, select, input{font:inherit;}
+    button{
+      -webkit-appearance:none;appearance:none;
+      border:0;border-radius:16px;padding:12px 14px;background:var(--green);
+      color:#fff;cursor:pointer;font-weight:700;min-height:46px;transition:transform .06s ease;
+    }
+    button:active{transform:scale(.97);}
+    button.secondary{background:var(--green-soft);color:var(--green-dark);}
+    button.ghost{background:#f2f5f3;color:var(--ink);}
+    button:disabled{opacity:.55;cursor:not-allowed;}
+    button.small{min-height:0;padding:9px 14px;border-radius:12px;font-size:.92rem;}
+
+    .icon-btn{display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:14px;
+      background:var(--green);color:#fff;cursor:pointer;min-height:0;transition:transform .06s ease,background .15s ease;}
+    .icon-btn:active{transform:scale(.94);}
+    .icon-btn svg{display:block;width:22px;height:22px;fill:currentColor;}
+    .icon-btn.primary{width:58px;height:46px;}
+    .icon-btn.small{width:44px;height:38px;background:var(--green-soft);color:var(--green-dark);}
+    .icon-btn.small.active{background:var(--green);color:#fff;}
+    .controls-spacer{flex:1 1 auto;}
+
+    select, input[type="text"]{
+      width:100%;border:2px solid var(--green-line);border-radius:16px;padding:12px 14px;
+      background:white;color:var(--ink);min-height:46px;
+    }
+    select:focus, input[type="text"]:focus{outline:none;border-color:var(--green-mid);}
+    label{display:block;color:var(--muted);font-size:.88rem;font-weight:700;margin-bottom:6px;}
+
+    .statbar{margin-top:20px;padding-top:14px;border-top:1px solid var(--green-line);}
+    .statrow{display:flex;justify-content:center;gap:26px;margin-top:6px;}
+    .statcell{text-align:center;}
+    .statcell strong{display:block;color:var(--green-dark);font-size:1.15rem;line-height:1;}
+    .statcell span{font-size:.72rem;color:var(--muted);}
+    .ring-wrap{position:relative;width:92px;height:92px;margin:0 auto 2px;}
+    .ring{transform:rotate(-90deg);display:block;}
+    .ring-track{fill:none;stroke:var(--green-soft);stroke-width:10;}
+    .ring-fill{fill:none;stroke:var(--green);stroke-width:10;stroke-linecap:round;
+      stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .4s ease;}
+    .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+    .ring-center strong{font-size:1.5rem;color:var(--green-dark);line-height:1;}
+    .ring-center span{font-size:.62rem;color:var(--muted);margin-top:2px;letter-spacing:.02em;}
+
+    .question-meta{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:.9rem;margin-bottom:10px;flex-wrap:wrap;}
+    .badge{display:inline-block;background:var(--green-soft);color:var(--green-dark);padding:6px 10px;border-radius:99px;font-weight:800;font-size:.78rem;}
+    .task{color:var(--muted);font-weight:700;font-size:.9rem;margin:4px 0 0;}
+    .question{font-size:1.25rem;font-weight:800;line-height:1.4;margin:8px 0 16px;}
+    .question .gap{display:inline-block;min-width:90px;border-bottom:3px solid var(--green-mid);margin:0 3px;}
+    .choices{display:grid;gap:10px;}
+    .choice{width:100%;text-align:left;background:#f7fbf8;color:var(--ink);border:2px solid var(--green-line);font-weight:700;}
+    .choice:hover{border-color:var(--green-mid);}
+    .choice.sel{border-color:var(--green);background:var(--green-soft);}
+    .choice.correct{border-color:var(--correct);background:#e3f5ea;color:#064b2c;}
+    .choice.wrong{border-color:var(--wrong);background:#fff0ee;color:#6e160f;}
+    .choice:disabled{opacity:1;cursor:default;}
+    .type-input.correct{border-color:var(--correct)!important;background:#e3f5ea;}
+    .type-input.wrong{border-color:var(--wrong)!important;background:#fff0ee;}
+    .feedback{margin-top:14px;padding:13px;border-radius:16px;display:none;line-height:1.5;}
+    .feedback.correct{display:block;background:#e3f5ea;color:#064b2c;border:1px solid #b7e2c8;}
+    .feedback.wrong{display:block;background:#fff0ee;color:#6e160f;border:1px solid #f1b7b2;}
+    .praise{font-size:1.05rem;font-weight:800;}
+    .fb-mark{font-weight:900;font-size:1.15rem;}
+    .fb-word{display:flex;align-items:center;gap:8px;margin-top:6px;font-weight:800;font-size:1.05rem;}
+    .fb-def{color:inherit;opacity:.9;margin-top:2px;}
+    .ar{direction:rtl;unicode-bidi:isolate;font-family:"Tahoma","Arial",sans-serif;font-weight:700;font-size:1.05rem;line-height:1.6;}
+    .fb-ar{margin-top:4px;text-align:right;}
+    .spell{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem;letter-spacing:.04em;}
+    .spell .bad{background:#f7c6c1;color:#6e160f;border-radius:3px;}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center;}
+    .hidden{display:none!important}
+    .small-text{color:var(--muted);font-size:.9rem;line-height:1.4;}
+    #mistakesInfo{margin:10px 0 0;font-weight:700;color:var(--green-dark);}
+    .review-list{padding-left:18px;}
+    .review-list li{margin:8px 0;}
+
+    .listen-box{display:flex;flex-direction:column;align-items:center;gap:12px;margin:6px 0 16px;}
+    .speak-big{width:96px;height:96px;border-radius:50%;}
+    .speak-big svg{width:44px;height:44px;}
+    .listen-row{display:flex;gap:10px;}
+    .hint{color:var(--muted);font-weight:700;font-size:.95rem;text-align:center;}
+    .speak-mini{flex:0 0 auto;width:36px;height:32px;border-radius:10px;background:var(--green);color:#fff;}
+    .speak-mini svg{width:18px;height:18px;}
+    .warn{background:#fff7e0;border:1px solid #f0d58a;color:#6b4f00;border-radius:14px;padding:10px 12px;margin-top:10px;font-size:.9rem;}
+    #confetti{position:fixed;inset:0;pointer-events:none;display:none;z-index:50;}
+    h2{color:var(--green-dark);margin-top:4px;}
+    h3{color:var(--green-dark);}
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="app">
+    <header>
+      <h1>ENGL111 Vocabulary Review</h1>
+      <p>Practice Units 1, 2, and 3 vocabulary.</p>
+    </header>
+
+    <section id="setup" class="card">
+      <div class="grid">
+        <div>
+          <label for="unitSel">Unit</label>
+          <select id="unitSel">
+            <option value="all">All units (1, 2, 3)</option>
+            <option value="1">Unit 1: Communication</option>
+            <option value="2">Unit 2: Travel Experiences</option>
+            <option value="3">Unit 3: Technology</option>
+          </select>
+        </div>
+        <div>
+          <label for="activity">Activity</label>
+          <select id="activity">
+            <option value="mixed">Mixed practice</option>
+            <option value="sentence">Complete the sentence</option>
+            <option value="definition">Word from the definition</option>
+            <option value="listen">Listen and spell</option>
+          </select>
+        </div>
+        <div>
+          <label for="mode">Practice mode</label>
+          <select id="mode">
+            <option value="endless">Practice until I stop</option>
+            <option value="ten">10 questions - 5 minutes</option>
+            <option value="twenty">20 questions</option>
+            <option value="review">Review my mistakes</option>
+          </select>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="startBtn" class="icon-btn primary" type="button" title="Start practice" aria-label="Start practice">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg>
+        </button>
+        <button id="soundBtn" class="icon-btn small" type="button" title="Sound effects on/off" aria-label="Sound effects on/off"></button>
+        <button id="typingBtn" class="icon-btn small" type="button" title="Typing challenge on/off" aria-label="Typing challenge on/off"></button>
+        <span class="controls-spacer"></span>
+        <button id="resetBestBtn" class="ghost small" type="button">Reset best</button>
+        <button id="resetProgressBtn" class="ghost small" type="button">Reset progress</button>
+      </div>
+      <p id="modeInfo" class="small-text"></p>
+      <p id="mistakesInfo" class="small-text"></p>
+      <div id="speechWarn" class="warn hidden">This browser cannot play word sounds. Try Chrome or Safari for "Listen and spell".</div>
+    </section>
+
+    <section id="game" class="card hidden">
+      <div class="question-meta">
+        <span id="catBadge" class="badge"></span>
+        <span id="timer"></span>
+      </div>
+      <p id="taskText" class="task"></p>
+      <div id="questionText" class="question"></div>
+      <div id="answerArea"></div>
+      <div id="feedback" class="feedback"></div>
+
+      <div class="controls game-controls">
+        <button id="submitBtn" class="small" type="button">Check</button>
+        <button id="nextBtn" class="secondary small hidden" type="button">Next</button>
+        <button id="stopBtn" class="ghost small" type="button">Stop</button>
+      </div>
+
+      <div class="statbar">
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 120 120" width="92" height="92" aria-hidden="true">
+            <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+            <circle id="ringProgress" class="ring-fill" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="ring-center"><strong id="ringNum">0</strong><span id="ringLabel"></span></div>
+        </div>
+        <div class="small-text" id="progressText" style="text-align:center"></div>
+        <div class="statrow">
+          <div class="statcell"><strong id="score">0</strong><span>Score</span></div>
+          <div class="statcell"><strong id="count">0</strong><span>Answered</span></div>
+          <div class="statcell"><strong id="best">0</strong><span>Best</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="summary" class="card hidden">
+      <h2>Practice Summary</h2>
+      <p id="summaryText"></p>
+      <div id="missedBox"></div>
+      <div class="controls">
+        <button id="againBtn" class="icon-btn primary" type="button" title="Practice again" aria-label="Practice again">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg>
+        </button>
+        <button id="homeBtn" class="icon-btn small" type="button" title="Home" aria-label="Home">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h3v9h5v-6h4v6h5v-9h3z"/></svg>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /* ---------- word list (from ENGL111_Vocabulary_Units_1-3.xlsx) ---------- */
+    const WORDS = [{"unit": 1, "word": "first impression", "pos": "noun", "def": "an idea, feeling or opinion about something or someone the first time you encounter it", "src": "Textbook", "sents": [{"s": "Smile when you meet your new manager. A good _____ is important.", "a": "first impression"}, {"s": "My _____ of Doha was very good. I liked it from the first day.", "a": "first impression"}, {"s": "Wear clean clothes to your job interview. You only get one chance to make a good _____.", "a": "first impression"}], "ar": "الانطباع الأول"}, {"unit": 1, "word": "communication", "pos": "noun", "def": "a message sent to someone by letter, email, phone, etc.", "src": "Textbook", "sents": [{"s": "Email is the most common form of _____ at work.", "a": "communication"}, {"s": "The university sends all _____ to students by email.", "a": "communication"}, {"s": "I received a _____ from the bank about my new card.", "a": "communication"}], "ar": "تواصل؛ رسالة"}, {"unit": 1, "word": "body language", "pos": "noun", "def": "the messages you send with your body without speaking", "src": "Textbook", "sents": [{"s": "She didn't say anything, but her _____ showed that she was bored.", "a": "body language"}, {"s": "Crossing your arms is a type of _____ that can look unfriendly.", "a": "body language"}, {"s": "In an interview, sit up straight and smile. Your _____ is important.", "a": "body language"}], "ar": "لغة الجسد"}, {"unit": 1, "word": "electronic media", "pos": "noun", "def": "sharing information or communicating using digital technology", "src": "Textbook", "sents": [{"s": "Today, most young people get the news from _____, not from newspapers.", "a": "electronic media"}, {"s": "Emails, websites and social media are all types of _____.", "a": "electronic media"}, {"s": "Our company uses _____ to talk to customers around the world.", "a": "electronic media"}], "ar": "الوسائط الإلكترونية"}, {"unit": 1, "word": "prediction", "pos": "noun", "def": "the act of saying what you think will happen in the future", "src": "Textbook", "sents": [{"s": "My _____ is that our team will win the match.", "a": "prediction"}, {"s": "The weather app made a _____ of 45°C for Monday.", "a": "prediction"}, {"s": "Her _____ was correct. It rained all weekend.", "a": "prediction"}], "ar": "توقُّع"}, {"unit": 1, "word": "pace (of a conversation)", "pos": "noun", "def": "speed of talking; how quickly a conversation moves between speakers", "src": "Textbook", "sents": [{"s": "The _____ of the conversation was too fast, so I couldn't understand everything.", "a": "pace"}, {"s": "Please speak more slowly. The _____ is too fast for the new students.", "a": "pace"}, {"s": "In a good conversation, both people keep a comfortable _____.", "a": "pace"}], "ar": "سرعة (المحادثة)"}, {"unit": 1, "word": "equipment", "pos": "noun", "def": "items and things that are used for a particular purpose or activity", "src": "Textbook", "sents": [{"s": "The science lab has a lot of new _____.", "a": "equipment"}, {"s": "What _____ do you need to go camping?", "a": "equipment"}, {"s": "Please don't touch the computer _____ in the classroom.", "a": "equipment"}], "ar": "معدّات"}, {"unit": 1, "word": "facial expression", "pos": "noun", "def": "a look on a person's face that communicates a meaning or feeling", "src": "Textbook", "sents": [{"s": "I knew she was happy from her _____.", "a": "facial expression"}, {"s": "A smile is the most common _____ in the world.", "a": "facial expression"}, {"s": "His _____ changed when he saw his exam score. He looked shocked.", "a": "facial expression"}], "ar": "تعبير الوجه"}, {"unit": 1, "word": "gesture", "pos": "noun", "def": "a body movement that communicates a message or feeling", "src": "Textbook", "sents": [{"s": "Waving your hand is a friendly _____.", "a": "gesture"}, {"s": "The teacher made a _____ with her finger to tell us to be quiet.", "a": "gesture"}, {"s": "In some countries, this hand _____ is rude, so be careful.", "a": "gesture"}], "ar": "إيماءة"}, {"unit": 1, "word": "shake hands", "pos": "verb", "def": "to take another person's hand as a greeting", "src": "Textbook", "sents": [{"s": "In business meetings, people often _____ when they meet.", "a": "shake hands"}, {"s": "The two players will _____ before the match starts.", "a": "shake hands"}, {"s": "It is polite to stand up and _____ with your new boss.", "a": "shake hands"}], "ar": "يُصافح"}, {"unit": 1, "word": "make eye contact", "pos": "verb", "def": "looking straight into another person's eyes", "src": "Textbook", "sents": [{"s": "When you speak to the class, try to _____ with your listeners.", "a": "make eye contact"}, {"s": "He was nervous, so he didn't _____ with the interviewer.", "a": "make eye contact"}, {"s": "Look up from your notes and _____ with the teacher when you answer.", "a": "make eye contact"}], "ar": "يتواصل بالنظر (ينظر في عيني الشخص)"}, {"unit": 1, "word": "switch on/off (something)", "pos": "verb", "def": "to turn off a device, light, TV, etc.", "src": "Textbook", "sents": [{"s": "Please _____ your phones before the exam starts.", "a": "switch off"}, {"s": "It's dark in here. Can you _____ the light, please?", "a": "switch on"}, {"s": "Don't forget to _____ the projector when the class finishes.", "a": "switch off"}], "ar": "يُشغِّل / يُطفئ"}, {"unit": 1, "word": "take turns", "pos": "verb", "def": "to avoid talking at the same time when having a conversation", "src": "Textbook", "sents": [{"s": "In the speaking test, you and your partner _____ to speak.", "a": "take turns"}, {"s": "Please _____ and don't all talk at the same time.", "a": "take turns"}, {"s": "In our group, we _____ to share our ideas.", "a": "take turns"}], "ar": "يتناوب (في الكلام)"}, {"unit": 1, "word": "interrupt", "pos": "verb", "def": "say something when another person is talking", "src": "Textbook", "sents": [{"s": "Please don't _____ me when I am speaking.", "a": "interrupt"}, {"s": "It is rude to _____ the teacher during the lesson.", "a": "interrupt"}, {"s": "Sorry to _____, but can I ask a question?", "a": "interrupt"}], "ar": "يُقاطع"}, {"unit": 1, "word": "formal", "pos": "adjective", "def": "clothes and behaviour that is used in important or official events", "src": "Textbook", "sents": [{"s": "A wedding is a _____ event, so wear your best clothes.", "a": "formal"}, {"s": "Write a _____ email to your professor. Start with 'Dear Dr. Ali'.", "a": "formal"}, {"s": "Jeans are not _____ enough for a job interview.", "a": "formal"}], "ar": "رسمي"}, {"unit": 1, "word": "polite", "pos": "adjective", "def": "having good manners and behaving in a thoughtful way", "src": "Textbook", "sents": [{"s": "It is _____ to say please and thank you.", "a": "polite"}, {"s": "She is always _____ to her teachers and classmates.", "a": "polite"}, {"s": "Be _____ to customers, even when they are angry.", "a": "polite"}], "ar": "مهذَّب"}, {"unit": 1, "word": "suitable", "pos": "adjective", "def": "acceptable or right for someone or something", "src": "Textbook", "sents": [{"s": "This film is not _____ for young children.", "a": "suitable"}, {"s": "Is this dress _____ for a job interview?", "a": "suitable"}, {"s": "The hotel has large rooms, so it is _____ for families.", "a": "suitable"}], "ar": "مناسب"}, {"unit": 2, "word": "feature", "pos": "noun", "def": "an important part of something", "src": "Textbook", "sents": [{"s": "The best _____ of this phone is its camera.", "a": "feature"}, {"s": "A big swimming pool is the main _____ of the hotel.", "a": "feature"}, {"s": "The new app has a _____ that translates your voice.", "a": "feature"}], "ar": "ميزة"}, {"unit": 2, "word": "escalator", "pos": "noun", "def": "moving stairs that move people up and down a building", "src": "Textbook", "sents": [{"s": "The lift was broken, so we took the _____ to the second floor.", "a": "escalator"}, {"s": "Stand on the right side of the _____ in the mall.", "a": "escalator"}, {"s": "The metro station has a long _____ down to the trains.", "a": "escalator"}], "ar": "سلّم متحرك"}, {"unit": 2, "word": "hostel", "pos": "noun", "def": "a building that provides cheap accommodation", "src": "Textbook", "sents": [{"s": "Students often stay in a _____ because it is cheap.", "a": "hostel"}, {"s": "The _____ had ten beds in one room.", "a": "hostel"}, {"s": "Hotels in London are expensive, so I booked a _____.", "a": "hostel"}], "ar": "نُزُل (سكن رخيص)"}, {"unit": 2, "word": "nationalities", "pos": "noun", "def": "groups of people from the same country, race, etc.", "src": "Textbook", "sents": [{"s": "People of many different _____ live in Doha.", "a": "nationalities"}, {"s": "Our class has students of five different _____.", "a": "nationalities"}, {"s": "Doctors and nurses of many _____ work at the hospital.", "a": "nationalities"}], "ar": "جنسيات"}, {"unit": 2, "word": "visa", "pos": "noun", "def": "a document or stamp needed to enter or leave a country", "src": "Textbook", "sents": [{"s": "You need a _____ to visit some countries.", "a": "visa"}, {"s": "My tourist _____ lets me stay for 30 days.", "a": "visa"}, {"s": "She went to the embassy to apply for a _____.", "a": "visa"}], "ar": "تأشيرة"}, {"unit": 2, "word": "industry", "pos": "noun", "def": "a group of manufacturers or business that make a particular product", "src": "Textbook", "sents": [{"s": "My sister wants to work in the fashion _____.", "a": "industry"}, {"s": "The oil and gas _____ is very important in Qatar.", "a": "industry"}, {"s": "Many people work in the car _____ in Germany.", "a": "industry"}], "ar": "صناعة؛ قطاع"}, {"unit": 2, "word": "entry", "pos": "noun", "def": "an item written or printed in a reference book", "src": "Textbook", "sents": [{"s": "Read the dictionary _____ to learn the meaning of the word.", "a": "entry"}, {"s": "The Wikipedia _____ on Doha has many photos.", "a": "entry"}, {"s": "Each _____ in the dictionary shows the word's part of speech.", "a": "entry"}], "ar": "مُدخَل (في قاموس أو موسوعة)"}, {"unit": 2, "word": "exhibit", "pos": "noun", "def": "an object or collection of objects shown in a museum", "src": "Added (not in textbook glossary)", "sents": [{"s": "The museum's new _____ shows old boats from Qatar.", "a": "exhibit"}, {"s": "Please don't touch the _____. It is very old.", "a": "exhibit"}, {"s": "My favourite _____ at the museum was the old gold jewellery.", "a": "exhibit"}], "ar": "قطعة معروضة (في متحف)"}, {"unit": 2, "word": "scenery", "pos": "noun", "def": "the natural things you see in a place, such as mountains, trees and the sea", "src": "Added (not in textbook glossary)", "sents": [{"s": "We drove through the mountains and enjoyed the beautiful _____.", "a": "scenery"}, {"s": "The _____ in Oman is amazing, with mountains and beaches.", "a": "scenery"}, {"s": "I took many photos of the _____ from the train window.", "a": "scenery"}], "ar": "مناظر طبيعية"}, {"unit": 2, "word": "sights", "pos": "noun", "def": "the interesting and famous places that tourists visit", "src": "Added (not in textbook glossary)", "sents": [{"s": "We saw all the famous _____ of Paris in two days.", "a": "sights"}, {"s": "The tour bus takes you to the main _____ of the city.", "a": "sights"}, {"s": "What are the best _____ to see in Doha?", "a": "sights"}], "ar": "معالم سياحية"}, {"unit": 2, "word": "sunbathing", "pos": "noun", "def": "lying or sitting in the sun to get warm or to get a tan", "src": "Added (not in textbook glossary)", "sents": [{"s": "We spent the afternoon _____ on the beach.", "a": "sunbathing"}, {"s": "Too much _____ can burn your skin.", "a": "sunbathing"}, {"s": "I don't like _____. I prefer to swim.", "a": "sunbathing"}], "ar": "التشمُّس"}, {"unit": 2, "word": "street food", "pos": "noun", "def": "cheap food that is cooked and sold outside, often from small stalls", "src": "Added (not in textbook glossary)", "sents": [{"s": "In Bangkok, you can buy cheap and delicious _____.", "a": "street food"}, {"s": "Souq Waqif has lots of tasty _____ in the evening.", "a": "street food"}, {"s": "I always eat _____ when I travel because it is cheap.", "a": "street food"}], "ar": "طعام الشارع"}, {"unit": 2, "word": "consideration", "pos": "noun", "def": "careful thought about something, or thinking about other people's feelings", "src": "Added (not in textbook glossary)", "sents": [{"s": "Please show _____ for other people and keep your voice down.", "a": "consideration"}, {"s": "After careful _____, she chose the cheaper hotel.", "a": "consideration"}, {"s": "Price is an important _____ when you book a holiday.", "a": "consideration"}], "ar": "مراعاة؛ تفكير متأنٍّ"}, {"unit": 2, "word": "queue", "pos": "noun", "def": "a line of people waiting for something", "src": "Textbook", "sents": [{"s": "There was a long _____ at the airport, so we waited for an hour.", "a": "queue"}, {"s": "Please wait in the _____ and don't push.", "a": "queue"}, {"s": "The _____ for the new café was very long on the first day.", "a": "queue"}], "ar": "طابور"}, {"unit": 2, "word": "crazy", "pos": "adjective", "def": "not sensible; stupid", "src": "Textbook", "sents": [{"s": "It is _____ to drive so fast in the rain.", "a": "crazy"}, {"s": "People said his idea was _____, but it worked.", "a": "crazy"}, {"s": "You want to walk 20 km in the summer heat? That's _____!", "a": "crazy"}], "ar": "مجنون؛ غير معقول"}, {"unit": 2, "word": "horrible", "pos": "adjective", "def": "unpleasant; very bad", "src": "Textbook", "sents": [{"s": "The weather was _____. It rained all week.", "a": "horrible"}, {"s": "The food at the hotel was _____, so we ate outside.", "a": "horrible"}, {"s": "I had a _____ day. I lost my phone and missed the bus.", "a": "horrible"}], "ar": "فظيع؛ سيئ جدًا"}, {"unit": 2, "word": "modern", "pos": "adjective", "def": "relating to the present time; using the most recent methods", "src": "Textbook", "sents": [{"s": "Doha has many _____ buildings made of glass.", "a": "modern"}, {"s": "The new hospital uses _____ equipment.", "a": "modern"}, {"s": "My grandmother prefers traditional clothes, but my sister likes _____ fashion.", "a": "modern"}], "ar": "حديث؛ عصري"}, {"unit": 2, "word": "complicated", "pos": "adjective", "def": "difficult to understand", "src": "Textbook", "sents": [{"s": "The instructions were very _____, so I asked for help.", "a": "complicated"}, {"s": "This maths problem is too _____ for me.", "a": "complicated"}, {"s": "Getting a visa can be _____ because there are many forms.", "a": "complicated"}], "ar": "معقَّد"}, {"unit": 2, "word": "rude", "pos": "adjective", "def": "offensive; not polite", "src": "Textbook", "sents": [{"s": "It is _____ to talk on your phone during class.", "a": "rude"}, {"s": "The waiter was _____ and didn't say thank you.", "a": "rude"}, {"s": "Don't be _____ to your little brother.", "a": "rude"}], "ar": "وقح؛ غير مهذَّب"}, {"unit": 2, "word": "traditional", "pos": "adjective", "def": "relating to old customs and beliefs", "src": "Textbook", "sents": [{"s": "Machboos is a _____ dish in Qatar.", "a": "traditional"}, {"s": "She wore a _____ dress at the wedding.", "a": "traditional"}, {"s": "The old souq has _____ shops and buildings.", "a": "traditional"}], "ar": "تقليدي"}, {"unit": 2, "word": "continuously", "pos": "adverb", "def": "happening without stopping", "src": "Textbook", "sents": [{"s": "It rained _____ for three days.", "a": "continuously"}, {"s": "The machine works _____, day and night.", "a": "continuously"}, {"s": "He talked _____ for an hour. He didn't stop once.", "a": "continuously"}], "ar": "باستمرار؛ دون توقف"}, {"unit": 3, "word": "gadget", "pos": "noun", "def": "small, useful piece of technology", "src": "Quizlet", "sents": [{"s": "A smartwatch is a useful _____ for runners.", "a": "gadget"}, {"s": "My brother loves new technology. He buys every new _____.", "a": "gadget"}, {"s": "This small kitchen _____ can cut vegetables in seconds.", "a": "gadget"}], "ar": "جهاز صغير مفيد؛ أداة تقنية"}, {"unit": 3, "word": "remote control unit", "pos": "noun", "def": "a small thing you hold to control a TV or machine from far away", "src": "Quizlet", "sents": [{"s": "I can't change the channel because I can't find the _____.", "a": "remote control unit"}, {"s": "Press the power button on the _____ to switch on the TV.", "a": "remote control unit"}, {"s": "The teacher uses a _____ to change the slides.", "a": "remote control unit"}], "ar": "جهاز التحكم عن بُعد (الريموت)"}, {"unit": 3, "word": "brochure", "pos": "noun", "def": "a booklet or pamphlet that contains descriptive information or advertising", "src": "Quizlet", "sents": [{"s": "I read the travel _____ before we booked the holiday.", "a": "brochure"}, {"s": "The shop gave me a _____ with pictures of all the new phones.", "a": "brochure"}, {"s": "The car _____ shows the price of every model.", "a": "brochure"}], "ar": "كُتيِّب؛ نشرة"}, {"unit": 3, "word": "container", "pos": "noun", "def": "a jar, box, or other object used for holding something", "src": "Quizlet", "sents": [{"s": "Keep the rice in a closed _____.", "a": "container"}, {"s": "I took my lunch to university in a plastic _____.", "a": "container"}, {"s": "Please put old batteries in the green _____.", "a": "container"}], "ar": "وعاء؛ حاوية"}, {"unit": 3, "word": "developing world", "pos": "noun", "def": "poorer countries that are still growing", "src": "Quizlet", "sents": [{"s": "Many children in the _____ cannot go to school.", "a": "developing world"}, {"s": "Clean water is a big problem in parts of the _____.", "a": "developing world"}, {"s": "Cheap mobile phones changed life for many people in the _____.", "a": "developing world"}], "ar": "الدول النامية"}, {"unit": 3, "word": "judge", "pos": "noun", "def": "a person who decides who wins a competition", "src": "Quizlet", "sents": [{"s": "The _____ gave our team first prize.", "a": "judge"}, {"s": "Each _____ gave the singer a score out of ten.", "a": "judge"}, {"s": "The _____ said my speech was the best in the contest.", "a": "judge"}], "ar": "حَكَم (في مسابقة)"}, {"unit": 3, "word": "decade", "pos": "noun", "def": "a period of ten years", "src": "Quizlet", "sents": [{"s": "Technology changed a lot in the last _____.", "a": "decade"}, {"s": "My parents lived in Dubai for a _____, from 2010 to 2020.", "a": "decade"}, {"s": "The university opened a new library this _____.", "a": "decade"}], "ar": "عَقْد (عشر سنوات)"}, {"unit": 3, "word": "headset", "pos": "noun", "def": "a device that contains a microphone and speakers and is worn on one's head", "src": "Quizlet", "sents": [{"s": "Put on your _____ and listen to the recording.", "a": "headset"}, {"s": "Gamers often wear a _____ to talk to other players.", "a": "headset"}, {"s": "Call centre workers wear a _____ to talk to customers.", "a": "headset"}], "ar": "سمّاعة رأس"}, {"unit": 3, "word": "subtitles", "pos": "noun", "def": "the words printed over a film in a foreign language to translate what is being said by the actors", "src": "Quizlet", "sents": [{"s": "I watch English films with _____ to learn new words.", "a": "subtitles"}, {"s": "The video has Arabic _____ at the bottom of the screen.", "a": "subtitles"}, {"s": "Turn on the _____ if you can't understand the speaker.", "a": "subtitles"}], "ar": "ترجمة مكتوبة على الشاشة"}, {"unit": 3, "word": "shelter", "pos": "noun", "def": "a place that provides protection from weather or danger such as a house", "src": "Quizlet", "sents": [{"s": "It started to rain, so we took _____ under a tree.", "a": "shelter"}, {"s": "After the storm, many families needed food and _____.", "a": "shelter"}, {"s": "Wait for the bus in the bus _____ because it is cool there.", "a": "shelter"}], "ar": "مأوى؛ ملجأ"}, {"unit": 3, "word": "scan", "pos": "verb", "def": "to look at the whole of something; to observe, using electromagnetism", "src": "Quizlet", "sents": [{"s": "_____ the QR code with your phone to see the menu.", "a": "scan"}, {"s": "At the airport, a machine will _____ your bags.", "a": "scan"}, {"s": "You can _____ your homework with your phone and send it to the teacher.", "a": "scan"}], "ar": "يمسح (ضوئيًا)"}, {"unit": 3, "word": "post", "pos": "verb", "def": "place text or images on the Internet, usually on social media or a blog", "src": "Quizlet", "sents": [{"s": "Don't _____ photos of other people without asking them.", "a": "post"}, {"s": "My sister likes to _____ cooking videos on TikTok.", "a": "post"}, {"s": "The teacher will _____ the homework on Blackboard tonight.", "a": "post"}], "ar": "ينشر (على الإنترنت)"}, {"unit": 3, "word": "attach", "pos": "verb", "def": "to tie together; to connect", "src": "Quizlet", "sents": [{"s": "Please _____ your essay to the email.", "a": "attach"}, {"s": "I forgot to _____ the photo, so I sent the email again.", "a": "attach"}, {"s": "You can _____ up to five files to your message.", "a": "attach"}], "ar": "يُرفِق"}, {"unit": 3, "word": "survive", "pos": "verb", "def": "to stay alive after a dangerous or difficult event or period", "src": "Quizlet", "sents": [{"s": "Plants cannot _____ without water.", "a": "survive"}, {"s": "Camels can _____ in the desert for a long time without water.", "a": "survive"}, {"s": "It is difficult to _____ in very cold places without warm clothes.", "a": "survive"}], "ar": "ينجو؛ يبقى على قيد الحياة"}, {"unit": 3, "word": "update", "pos": "verb", "def": "make software newer, or add new information", "src": "Quizlet", "sents": [{"s": "The teacher will _____ us on the exam date next week.", "a": "update"}, {"s": "Please _____ your manager if the plan changes.", "a": "update"}, {"s": "My phone is slow. I need to _____ the software.", "a": "update"}], "ar": "يُحدِّث"}, {"unit": 3, "word": "accurate", "pos": "adjective", "def": "correct in all details; exact", "src": "Quizlet", "sents": [{"s": "Is this clock _____? It says it is 3 o'clock.", "a": "accurate"}, {"s": "Check your answers carefully to make sure they are _____.", "a": "accurate"}, {"s": "The weather app is not always _____. Yesterday it was wrong.", "a": "accurate"}], "ar": "دقيق"}, {"unit": 3, "word": "virtual", "pos": "adjective", "def": "not real; created in a computer to appear real", "src": "Quizlet", "sents": [{"s": "With the headset, we took a _____ tour of the pyramids.", "a": "virtual"}, {"s": "In the game, you can walk around a _____ city.", "a": "virtual"}, {"s": "Some universities have _____ classrooms where students meet as 3D characters.", "a": "virtual"}], "ar": "افتراضي"}, {"unit": 3, "word": "poisonous", "pos": "adjective", "def": "chemically causing illness or death when touched", "src": "Quizlet", "sents": [{"s": "Don't touch that snake. It is _____.", "a": "poisonous"}, {"s": "Some plants are _____, so don't touch them.", "a": "poisonous"}, {"s": "Keep _____ cleaning products away from children.", "a": "poisonous"}], "ar": "سامّ"}, {"unit": 3, "word": "exhausted", "pos": "adjective", "def": "very tired; having run out of energy", "src": "Quizlet", "sents": [{"s": "After the long flight, I was _____.", "a": "exhausted"}, {"s": "She studied all night, so she was _____ in the morning.", "a": "exhausted"}, {"s": "The runners were _____ at the end of the marathon.", "a": "exhausted"}], "ar": "مُنهَك؛ متعب جدًا"}];
+
+    const UNIT_NAMES = {1:"Unit 1: Communication", 2:"Unit 2: Travel Experiences", 3:"Unit 3: Technology"};
+    // Spoken/typed form for Listen and spell (only where the list form has extras)
+    const SPOKEN = {"pace (of a conversation)":"pace", "switch on/off (something)":"switch off"};
+    function spokenForm(w){ return SPOKEN[w.word] || w.word; }
+    function baseForm(w){ return SPOKEN[w.word] || w.word; }
+
+    /* ---------- build question bank ---------- */
+    const BANK = [];
+    WORDS.forEach((w, wi) => {
+      w.id = wi;
+      w.sents.forEach((s, si) => BANK.push({ id:`w${wi}s${si}`, type:"sentence", w, prompt:s.s, answer:s.a }));
+      BANK.push({ id:`w${wi}d`, type:"definition", w, prompt:w.def, answer:baseForm(w) });
+      BANK.push({ id:`w${wi}l`, type:"listen", w, prompt:"", answer:spokenForm(w) });
+    });
+
+    /* ---------- storage (falls back to memory) ---------- */
+    const store = (function(){
+      let ok = true;
+      try { const k = "__engl111v_t"; window.localStorage.setItem(k, "1"); window.localStorage.removeItem(k); }
+      catch(e){ ok = false; }
+      const mem = {};
+      return {
+        get(k){ try { return ok ? window.localStorage.getItem(k) : (k in mem ? mem[k] : null); } catch(e){ return (k in mem ? mem[k] : null); } },
+        set(k,v){ try { if(ok) window.localStorage.setItem(k, String(v)); else mem[k] = String(v); } catch(e){ mem[k] = String(v); } },
+        remove(k){ try { if(ok) window.localStorage.removeItem(k); else delete mem[k]; } catch(e){ delete mem[k]; } }
+      };
+    })();
+
+    const $ = id => document.getElementById(id);
+    const els = {
+      setup:$("setup"), game:$("game"), summary:$("summary"), startBtn:$("startBtn"), soundBtn:$("soundBtn"), typingBtn:$("typingBtn"),
+      resetBestBtn:$("resetBestBtn"), resetProgressBtn:$("resetProgressBtn"), unitSel:$("unitSel"), activity:$("activity"), mode:$("mode"),
+      modeInfo:$("modeInfo"), mistakesInfo:$("mistakesInfo"), speechWarn:$("speechWarn"),
+      catBadge:$("catBadge"), timer:$("timer"), taskText:$("taskText"), score:$("score"), best:$("best"), count:$("count"),
+      ringProgress:$("ringProgress"), ringNum:$("ringNum"), ringLabel:$("ringLabel"), progressText:$("progressText"),
+      questionText:$("questionText"), answerArea:$("answerArea"), feedback:$("feedback"),
+      submitBtn:$("submitBtn"), nextBtn:$("nextBtn"), stopBtn:$("stopBtn"),
+      summaryText:$("summaryText"), missedBox:$("missedBox"), againBtn:$("againBtn"), homeBtn:$("homeBtn"), confetti:$("confetti")
+    };
+
+    /* ---------- word pronunciation (browser speech) ---------- */
+    const canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+    let voice = null;
+    function pickVoice(){
+      if(!canSpeak) return;
+      const vs = window.speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
+      if(!vs.length) return;
+      const prefer = [/Google UK English Female/i, /Google US English/i, /Samantha/i, /Serena/i, /Daniel/i, /Karen/i, /Microsoft (Libby|Sonia|Aria|Jenny)/i, /Natural/i];
+      for(const re of prefer){ const v = vs.find(x => re.test(x.name)); if(v){ voice = v; return; } }
+      voice = vs.find(v => /en[-_](GB|US)/i.test(v.lang)) || vs[0];
+    }
+    if(canSpeak){ pickVoice(); window.speechSynthesis.onvoiceschanged = pickVoice; }
+    function speak(text, slow){
+      if(!canSpeak) return;
+      try{
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        if(voice){ u.voice = voice; u.lang = voice.lang; } else { u.lang = "en-GB"; }
+        u.rate = slow ? 0.6 : 0.9;
+        window.speechSynthesis.speak(u);
+      }catch(e){}
+    }
+    const IC_SPEAK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    const IC_SLOW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15c0-4 3.5-7 8-7s7 2.5 8 5h2a1.5 1.5 0 0 1 0 3h-2.2c-.4 1.6-1.2 2-2.3 2h-1l-1-2H9l-1 2H6.5c-1.2 0-2-.8-2.2-1.6L3 16z"/><circle cx="11" cy="12.5" r="1.3" fill="#fff"/></svg>';
+    function miniSpeaker(text){
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "icon-btn speak-mini"; b.title = "Hear the word"; b.setAttribute("aria-label","Hear the word");
+      b.innerHTML = IC_SPEAK; b.onclick = () => speak(text);
+      return b;
+    }
+
+    /* ---------- sound effects, haptics, confetti, praise ---------- */
+    let soundOn = store.get("engl111VocSound") !== "off";
+    const IC_SPK_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9z"/><path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    const IC_SPK_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9z"/><path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    function refreshSoundBtn(){ els.soundBtn.innerHTML = soundOn ? IC_SPK_ON : IC_SPK_OFF; els.soundBtn.classList.toggle("active", soundOn); }
+    refreshSoundBtn();
+
+    let typingMode = store.get("engl111VocType") === "on";
+    const IC_KBD_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    const IC_KBD_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.4 13.4l3.2 3.2M13.6 13.4l-3.2 3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    function refreshTypingBtn(){ els.typingBtn.innerHTML = typingMode ? IC_KBD_ON : IC_KBD_OFF; els.typingBtn.classList.toggle("active", typingMode); refreshModeInfo(); }
+
+    let audioCtx = null;
+    function ensureCtx(){
+      if(!audioCtx){ try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; } }
+      if(audioCtx && audioCtx.state === "suspended"){ try{ audioCtx.resume(); }catch(e){} }
+      return audioCtx;
+    }
+    function unlockAudio(){
+      const ctx = ensureCtx(); if(!ctx) return;
+      try{ const b = ctx.createBuffer(1,1,22050); const s = ctx.createBufferSource(); s.buffer=b; s.connect(ctx.destination); s.start(0); }catch(e){}
+    }
+    function sfx(kind){
+      if(!soundOn) return;
+      const ctx = ensureCtx(); if(!ctx) return;
+      try{
+        const now = ctx.currentTime + 0.03;
+        const beep = (fa, fb, type, t0, dur, vol) => {
+          const o = ctx.createOscillator(), g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination); o.type = type; o.frequency.setValueAtTime(fa, t0);
+          if(fb) o.frequency.exponentialRampToValueAtTime(fb, t0 + dur);
+          g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          o.start(t0); o.stop(t0 + dur + 0.02);
+        };
+        if(kind === "correct") beep(660, 990, "sine", now, 0.18, 0.32);
+        else if(kind === "wrong") beep(240, 120, "triangle", now, 0.30, 0.28);
+        else if(kind === "win") [523,659,784,1047].forEach((f,i)=>beep(f, null, "sine", now + i*0.09, 0.2, 0.3));
+      }catch(e){}
+    }
+    function buzz(p){ if(soundOn && navigator.vibrate){ try{ navigator.vibrate(p); }catch(e){} } }
+
+    const cctx = els.confetti.getContext("2d");
+    let confettiRAF = null;
+    function launchConfetti(){
+      if(!cctx) return;
+      const W = els.confetti.width = window.innerWidth, H = els.confetti.height = window.innerHeight;
+      els.confetti.style.display = "block";
+      const colors = ["#1E7A46","#3FA36A","#8BD3A6","#11502C","#C9E8D4","#F2C94C"];
+      const parts = [];
+      for(let i=0;i<80;i++) parts.push({ x:Math.random()*W, y:-20-Math.random()*H*0.3, r:4+Math.random()*6, c:colors[i%colors.length], vy:2+Math.random()*3.5, vx:-1.6+Math.random()*3.2, rot:Math.random()*6.28, vr:-0.2+Math.random()*0.4 });
+      cancelAnimationFrame(confettiRAF);
+      const start = performance.now();
+      (function frame(now){
+        const t = now - start; cctx.clearRect(0,0,W,H);
+        parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.03; p.rot+=p.vr; cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot); cctx.fillStyle=p.c; cctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.65); cctx.restore(); });
+        if(t < 1500) confettiRAF = requestAnimationFrame(frame); else { cctx.clearRect(0,0,W,H); els.confetti.style.display="none"; }
+      })(start);
+    }
+    const PRAISE = ["Nice! 👏","On fire! 🔥","Perfect!","Well done!","Keep going!","Brilliant!","Great job!","إجابة صحيحة! 🌟","ممتاز!","رائع!","بالضبط!"];
+    const randomPraise = () => PRAISE[Math.floor(Math.random()*PRAISE.length)];
+    function animateNumber(el, from, to){
+      const start = performance.now(), dur = 400;
+      (function step(now){ const p = Math.min(1,(now-start)/dur); el.textContent = Math.round(from+(to-from)*p); if(p<1) requestAnimationFrame(step); })(start);
+    }
+
+    /* ---------- spaced repetition (Leitner boxes) ---------- */
+    const SR_KEY = "engl111VocSR";
+    function loadSR(){ try{ return JSON.parse(store.get(SR_KEY)) || {}; }catch(e){ return {}; } }
+    function saveSR(sr){ try{ store.set(SR_KEY, JSON.stringify(sr)); }catch(e){} }
+    function boxOf(sr, id){ return (sr[id] && sr[id].box) ? sr[id].box : 1; }
+    function recordResult(id, ok){
+      const sr = loadSR(); const rec = sr[id] || { box:1, right:0, wrong:0 };
+      if(ok){ rec.box = Math.min(5,(rec.box||1)+1); rec.right=(rec.right||0)+1; } else { rec.box = 1; rec.wrong=(rec.wrong||0)+1; }
+      rec.last = Date.now(); sr[id] = rec; saveSR(sr);
+    }
+    function inFocus(q){
+      const u = els.unitSel.value, a = els.activity.value;
+      if(u !== "all" && String(q.w.unit) !== u) return false;
+      if(q.type === "listen" && !canSpeak) return false;
+      return a === "mixed" || q.type === a;
+    }
+    function mistakesForFocus(){
+      const sr = loadSR();
+      return BANK.filter(q => inFocus(q) && sr[q.id] && sr[q.id].box === 1 && (sr[q.id].wrong||0) > 0);
+    }
+    function weightedOrder(pool){
+      const sr = loadSR();
+      return pool.map(q => ({ q, k: Math.random() / Math.max(1, 6 - boxOf(sr, q.id)) })).sort((a,b)=>a.k-b.k).map(o=>o.q);
+    }
+    // avoid the same word twice in a row
+    function spreadWords(list){
+      const out = []; const rest = list.slice();
+      while(rest.length){
+        const last = out.length ? out[out.length-1].w.id : -1;
+        let i = rest.findIndex(q => q.w.id !== last); if(i < 0) i = 0;
+        out.push(rest.splice(i,1)[0]);
+      }
+      return out;
+    }
+    function updateMistakesInfo(){
+      const n = mistakesForFocus().length;
+      els.mistakesInfo.textContent = n ? `🔁 You have ${n} saved mistake${n>1?"s":""} to review here.` : "✓ No saved mistakes here yet.";
+    }
+    function refreshModeInfo(){
+      const a = els.activity.value;
+      els.modeInfo.textContent =
+        a === "listen" ? "🎧 Listen and spell: press the speaker, then type the word. Spelling counts." :
+        typingMode ? "⌨️ Typing challenge is ON: type the word. Spelling counts." :
+        "Tip: turn on the keyboard button for the typing challenge.";
+    }
+
+    /* ---------- session ---------- */
+    let session = {};
+    const shuffle = arr => { const a = arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+    function focusKey(){ return els.unitSel.value + "_" + els.activity.value; }
+    function bestKey(){ return "engl111VocBest_" + focusKey(); }
+    function getBest(){ return Number(store.get(bestKey()) || 0); }
+    function setBest(s){ if(s > getBest()) store.set(bestKey(), String(s)); }
+    function normalize(s){ return String(s).trim().toLowerCase().replace(/[’']/g,"'").replace(/\s+/g," "); }
+    const isCorrect = (u, a) => normalize(u) === normalize(a);
+    const isTyped = q => q.type === "listen" || typingMode;
+
+    function start(){
+      let pool;
+      if(els.mode.value === "review"){
+        pool = mistakesForFocus();
+        if(!pool.length){ alert("No saved mistakes to review here yet. Try a round first!"); return; }
+        pool = shuffle(pool);
+      } else {
+        pool = BANK.filter(inFocus);
+        if(!pool.length){ alert("This activity is not available in this browser."); return; }
+        pool = weightedOrder(pool);
+      }
+      pool = spreadWords(pool);
+      const mode = els.mode.value;
+      const max = mode === "ten" ? 10 : mode === "twenty" ? 20 : mode === "review" ? pool.length : null;
+      session = { questions:pool, index:0, score:0, streak:0, answered:0, checked:false, max, timer:null, timeLeft: mode==="ten" ? 300 : 0, mode, current:null, missed:[] };
+      els.setup.classList.add("hidden"); els.summary.classList.add("hidden"); els.game.classList.remove("hidden");
+      els.score.textContent = "0"; els.best.textContent = getBest();
+      if(mode === "ten") startTimer();
+      renderQuestion();
+    }
+    function startTimer(){
+      clearInterval(session.timer);
+      session.timer = setInterval(()=>{ session.timeLeft--; els.timer.textContent = `Time: ${formatTime(session.timeLeft)}`; if(session.timeLeft <= 0) finish("Time is up."); }, 1000);
+    }
+    const formatTime = sec => `${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")}`;
+    function setRing(fr, num, label){ els.ringProgress.style.strokeDashoffset = 326.7 * (1 - Math.max(0, Math.min(1, fr))); els.ringNum.textContent = num; els.ringLabel.textContent = label; }
+    function updateStats(){
+      els.best.textContent = Math.max(getBest(), session.score);
+      els.count.textContent = session.answered;
+      els.timer.textContent = session.mode === "ten" ? `Time: ${formatTime(session.timeLeft)}` : "";
+      if(session.max){ setRing(session.answered/session.max, session.answered, "of " + session.max); els.progressText.textContent = `${session.answered} of ${session.max}`; }
+      else { const into = session.streak % 10; setRing(session.streak === 0 ? 0 : (into === 0 ? 1 : into/10), session.streak, "streak"); els.progressText.textContent = ""; }
+    }
+
+    /* ---------- rendering ---------- */
+    function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+    function distractors(q, n){
+      const sameUnit = WORDS.filter(w => w.unit === q.w.unit && w.id !== q.w.id);
+      const samePos = shuffle(sameUnit.filter(w => w.pos === q.w.pos));
+      const other = shuffle(sameUnit.filter(w => w.pos !== q.w.pos));
+      const picks = [];
+      [...samePos, ...other].forEach(w => { const f = baseForm(w); if(picks.length < n && normalize(f) !== normalize(q.answer) && !picks.includes(f)) picks.push(f); });
+      return picks;
+    }
+    function renderQuestion(){
+      session.checked = false;
+      els.feedback.className = "feedback"; els.feedback.style.display = "none"; els.feedback.innerHTML = "";
+      els.nextBtn.classList.add("hidden"); els.submitBtn.classList.remove("hidden");
+      els.answerArea.innerHTML = "";
+      if(session.index >= session.questions.length){
+        if(session.mode === "review" || session.max){ finish(); return; }
+        session.questions = spreadWords(weightedOrder(session.questions)); session.index = 0;
+      }
+      const q = session.current = session.questions[session.index++];
+      els.catBadge.textContent = UNIT_NAMES[q.w.unit];
+
+      if(q.type === "listen"){
+        els.taskText.textContent = "Listen and type the word.";
+        els.questionText.innerHTML = "";
+        const box = document.createElement("div"); box.className = "listen-box";
+        const big = document.createElement("button"); big.type="button"; big.className="icon-btn speak-big"; big.title="Play the word"; big.setAttribute("aria-label","Play the word");
+        big.innerHTML = IC_SPEAK; big.onclick = () => { speak(q.answer); focusInput(); };
+        const slow = document.createElement("button"); slow.type="button"; slow.className="secondary small"; slow.innerHTML = "🐢 Slow"; slow.onclick = () => { speak(q.answer, true); focusInput(); };
+        const nWords = q.answer.split(" ").length;
+        const hint = document.createElement("div"); hint.className = "hint";
+        hint.textContent = `${q.w.pos}${nWords > 1 ? " · " + nWords + " words" : ""}`;
+        const row = document.createElement("div"); row.className = "listen-row"; row.appendChild(slow);
+        box.append(big, row, hint);
+        els.answerArea.appendChild(box);
+        addInput("Type what you hear…");
+        setTimeout(() => speak(q.answer), 250);
+      } else {
+        if(q.type === "sentence"){
+          els.taskText.textContent = "Complete the sentence.";
+          els.questionText.innerHTML = escapeHtml(q.prompt).replace("_____", '<span class="gap">&nbsp;</span>');
+        } else {
+          els.taskText.textContent = `Which word matches this meaning? (${q.w.pos})`;
+          els.questionText.textContent = q.prompt;
+        }
+        if(isTyped(q)) addInput("Type the missing word…");
+        else {
+          const wrap = document.createElement("div"); wrap.className = "choices";
+          shuffle([q.answer, ...distractors(q, 3)]).forEach(c => {
+            const b = document.createElement("button"); b.type="button"; b.className = "choice"; b.textContent = c; b.dataset.value = c;
+            b.onclick = () => { if(session.checked) return; [...wrap.children].forEach(x=>{ x.dataset.selected="false"; x.classList.remove("sel"); }); b.dataset.selected="true"; b.classList.add("sel"); };
+            wrap.appendChild(b);
+          });
+          els.answerArea.appendChild(wrap);
+        }
+      }
+      updateStats();
+    }
+    function addInput(ph){
+      const input = document.createElement("input");
+      input.type="text"; input.className="type-input"; input.id="typeInput";
+      input.autocomplete="off"; input.autocapitalize="off"; input.spellcheck=false; input.setAttribute("autocorrect","off");
+      input.placeholder = ph;
+      els.answerArea.appendChild(input);
+      setTimeout(focusInput, 0);
+    }
+    function focusInput(){ const i = $("typeInput"); if(i && !i.disabled){ try{ i.focus(); }catch(e){} } }
+
+    function spellDiff(user, answer){
+      const u = normalize(user), a = normalize(answer);
+      let out = "";
+      for(let i=0;i<u.length;i++){ const ch = escapeHtml(u[i] === " " ? "\u00a0" : u[i]); out += (u[i] === a[i]) ? ch : `<span class="bad">${ch}</span>`; }
+      return out || "(blank)";
+    }
+
+    function checkAnswer(){
+      if(session.checked) return;
+      const q = session.current;
+      let user = null;
+      if(isTyped(q)){ const i = $("typeInput"); user = i ? i.value : ""; if(!user.trim()){ return showEmpty("Type your answer first."); } }
+      else { const sel = [...document.querySelectorAll(".choice")].find(b=>b.dataset.selected==="true"); if(!sel) return showEmpty("Choose an answer first."); user = sel.dataset.value; }
+      const ok = isCorrect(user, q.answer);
+      session.checked = true; session.answered++;
+      recordResult(q.id, ok);
+      const prev = session.score;
+      els.feedback.style.display = "block";
+      const wordLine = document.createElement("div"); wordLine.className = "fb-word";
+      wordLine.append(miniSpeaker(q.answer));
+      const wl = document.createElement("span"); wl.textContent = q.answer; wordLine.append(wl);
+      const def = document.createElement("div"); def.className = "fb-def"; def.textContent = `${q.w.pos}: ${q.w.def}`;
+      const ar = document.createElement("div"); ar.className = "fb-ar ar"; ar.dir = "rtl"; ar.textContent = q.w.ar || "";
+
+      if(ok){
+        session.score++; session.streak++;
+        const milestone = session.streak % 10 === 0;
+        els.feedback.className = "feedback correct";
+        els.feedback.innerHTML = `<div class="praise"><span class="fb-mark">✓</span> <span dir="auto">${randomPraise()}</span></div>`;
+        els.feedback.append(wordLine, def, ar);
+        if(milestone){ sfx("win"); buzz([15,40,15,40,60]); launchConfetti(); } else { sfx("correct"); buzz(25); }
+        animateNumber(els.score, prev, session.score);
+      } else {
+        session.streak = 0; session.missed.push(q);
+        els.feedback.className = "feedback wrong";
+        els.feedback.innerHTML = `<div class="fb-line"><span class="fb-mark">✗</span> The answer is:</div>`;
+        els.feedback.append(wordLine);
+        if(isTyped(q)){
+          const sp = document.createElement("div"); sp.style.marginTop = "6px";
+          sp.innerHTML = `You typed: <span class="spell">${spellDiff(user, q.answer)}</span>`;
+          els.feedback.append(sp);
+        }
+        els.feedback.append(def, ar);
+        sfx("wrong"); buzz([30,40,30]);
+      }
+      if(isTyped(q)){ const i = $("typeInput"); if(i){ i.classList.add(ok ? "correct" : "wrong"); i.disabled = true; } }
+      else {
+        document.querySelectorAll(".choice").forEach(b => {
+          b.disabled = true;
+          if(normalize(b.dataset.value) === normalize(q.answer)) b.classList.add("correct");
+          else if(b.dataset.selected === "true") b.classList.add("wrong");
+          b.classList.remove("sel");
+        });
+      }
+      els.submitBtn.classList.add("hidden");
+      els.nextBtn.classList.remove("hidden");
+      updateStats();
+      if(session.max && session.answered >= session.max){ els.nextBtn.textContent = "Finish"; } else { els.nextBtn.textContent = "Next"; }
+    }
+    function showEmpty(msg){ els.feedback.className = "feedback wrong"; els.feedback.style.display = "block"; els.feedback.textContent = msg; }
+
+    function finish(reason=""){
+      clearInterval(session.timer);
+      if(canSpeak) try{ window.speechSynthesis.cancel(); }catch(e){}
+      setBest(session.score);
+      els.game.classList.add("hidden"); els.summary.classList.remove("hidden");
+      const total = session.answered || 0, pct = total ? Math.round(session.score/total*100) : 0;
+      const perfect = total > 0 && session.score === total;
+      els.summaryText.innerHTML = `${reason ? reason + "<br>" : ""}<strong>Score:</strong> ${session.score}/${total} (${pct}%). <strong>Best here:</strong> ${getBest()}.` + (perfect ? `<br><strong>Perfect round! 🎉</strong>` : "");
+      if(perfect){ sfx("win"); launchConfetti(); }
+      els.missedBox.innerHTML = "";
+      if(session.missed.length){
+        const seen = new Set(), words = [];
+        session.missed.slice().reverse().forEach(q => { if(!seen.has(q.w.id)){ seen.add(q.w.id); words.push(q); } });
+        const h = document.createElement("h3"); h.textContent = "Review these words:";
+        const ul = document.createElement("ul"); ul.className = "review-list";
+        words.slice(0,10).forEach(q => {
+          const li = document.createElement("li");
+          li.style.display = "flex"; li.style.gap = "8px"; li.style.alignItems = "flex-start";
+          li.append(miniSpeaker(q.answer));
+          const t = document.createElement("span"); t.innerHTML = `<strong>${escapeHtml(q.w.word)}</strong> (${q.w.pos}): ${escapeHtml(q.w.def)} <span class="ar" dir="rtl" style="display:block;text-align:right">${escapeHtml(q.w.ar || "")}</span>`;
+          li.append(t); ul.append(li);
+        });
+        els.missedBox.append(h, ul);
+      } else {
+        els.missedBox.innerHTML = "<p>Great work. No missed words in this round.</p>";
+      }
+    }
+
+    /* ---------- bindings ---------- */
+    els.startBtn.onclick = () => { unlockAudio(); if(canSpeak) speak(" "); start(); };
+    els.submitBtn.onclick = () => { ensureCtx(); checkAnswer(); };
+    els.nextBtn.onclick = () => { if(session.max && session.answered >= session.max) finish(); else renderQuestion(); };
+    els.stopBtn.onclick = () => finish("Practice stopped.");
+    els.againBtn.onclick = () => { unlockAudio(); start(); };
+    els.homeBtn.onclick = () => { clearInterval(session.timer); els.summary.classList.add("hidden"); els.game.classList.add("hidden"); els.setup.classList.remove("hidden"); updateMistakesInfo(); };
+    els.soundBtn.onclick = () => { soundOn = !soundOn; store.set("engl111VocSound", soundOn ? "on" : "off"); refreshSoundBtn(); if(soundOn){ unlockAudio(); sfx("correct"); } };
+    els.typingBtn.onclick = () => { typingMode = !typingMode; store.set("engl111VocType", typingMode ? "on" : "off"); refreshTypingBtn(); };
+    els.resetBestBtn.onclick = () => { store.remove(bestKey()); alert("Best score reset for this unit and activity."); };
+    els.resetProgressBtn.onclick = () => { if(confirm("Reset all saved progress and mistakes?")){ store.remove(SR_KEY); updateMistakesInfo(); } };
+    [els.unitSel, els.activity].forEach(s => s.addEventListener("change", () => { updateMistakesInfo(); refreshModeInfo(); store.set("engl111VocFocus", JSON.stringify({u:els.unitSel.value, a:els.activity.value})); }));
+    document.addEventListener("keydown", e => {
+      if(els.game.classList.contains("hidden")) return;
+      if(e.key === "Enter"){ e.preventDefault(); if(!els.nextBtn.classList.contains("hidden")) els.nextBtn.click(); else els.submitBtn.click(); }
+    });
+    try{ const f = JSON.parse(store.get("engl111VocFocus")); if(f){ els.unitSel.value = f.u; els.activity.value = f.a; } }catch(e){}
+    if(!canSpeak){ els.speechWarn.classList.remove("hidden"); [...els.activity.options].forEach(o => { if(o.value === "listen") o.disabled = true; }); if(els.activity.value === "listen") els.activity.value = "mixed"; }
+    refreshTypingBtn();
+    updateMistakesInfo();
+  </script>
+</body>
+</html>
